@@ -10,6 +10,7 @@ type state = {
   isStrict: bool,
   isPlaying: bool,
   points: int,
+  income: int,
 };
 
 type action =
@@ -112,6 +113,7 @@ let make = _children => {
     isStrict: false,
     isPlaying: false,
     points: 0,
+    income: 1,
   },
   reducer: (action, state) =>
     switch (action) {
@@ -230,7 +232,7 @@ let make = _children => {
     ();
   },
   render: self => {
-    let {level, active, isStrict, isPlaying, points} = self.state;
+    let {level, active, isStrict, isPlaying, points, income} = self.state;
     <div className=Styles.container>
       <h1> "Simon Game in ReasonReact"->ReasonReact.string </h1>
       <h2> {ReasonReact.string(string_of_int(points))} </h2>
@@ -238,7 +240,7 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Green, ~active)}
-          onClick={_e => self.send(Click(2))}
+          onClick={_e => self.send(Click(income))}
           disabled=isPlaying
         />
         <button
