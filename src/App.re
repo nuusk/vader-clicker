@@ -57,9 +57,9 @@ module Styles = {
 
   let box = (~bgColor: Types.colors, ~active: option(Types.colors)) => {
     let baseStyle = [
-      minHeight(`px(250)),
-      minWidth(`px(250)),
-      border(`px(0), `none, `transparent),
+      minHeight(`px(120)),
+      minWidth(`px(120)),
+      border(`px(2), `none, `transparent),
     ];
 
     let opacity =
@@ -74,10 +74,10 @@ module Styles = {
 
     let bgColor =
       switch (bgColor) {
-      | Green => backgroundColor(`hex("07f767"))
-      | Red => backgroundColor(`hex("f95e59"))
-      | Blue => backgroundColor(`hex("00bcea"))
-      | Yellow => backgroundColor(`hex("f4ed7c"))
+      | Green => backgroundColor(`hex("78ab2a"))
+      | Red => backgroundColor(`hex("fd2475"))
+      | Blue => backgroundColor(`hex("0283c7"))
+      | Yellow => backgroundColor(`hex("fde916"))
       };
 
     style([bgColor, opacity, ...baseStyle]);
@@ -237,7 +237,7 @@ let make = _children => {
   render: self => {
     let {level, active, isStrict, isPlaying, points, income} = self.state;
     <div className=Styles.container>
-      <h1> "Simon Game in ReasonReact"->ReasonReact.string </h1>
+      <h1> "ciacho judasza"->ReasonReact.string </h1>
       <h2> {ReasonReact.string(string_of_int(points))} </h2>
       <div className=Styles.boxes>
         <button
