@@ -20,6 +20,7 @@ type action =
   | ResetColor
   | Input(Types.colors)
   | Click(int)
+  | BuyBonus(int)
   | CheckInput
   | Reset
   | SetStrictness
@@ -165,6 +166,8 @@ let make = _children => {
       )
     | Click(bonus) =>
       ReasonReact.Update({...state, points: state.points + bonus})
+    | BuyBonus(bonus) =>
+      ReasonReact.Update({...state, income: state.income + bonus})
     | CheckInput =>
       let {level, input, sequence, isStrict} = state;
       let currentUserColor = Belt.List.headExn(input);
@@ -246,7 +249,7 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Red, ~active)}
-          onClick={_e => self.send(Input(Red))}
+          onClick={_e => self.send(BuyBonus(1))}
           disabled=isPlaying
         />
         <button
