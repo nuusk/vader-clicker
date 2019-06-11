@@ -18,7 +18,7 @@ type action =
   | PlaySound(Types.colors)
   | ResetColor
   | Input(Types.colors)
-  | Click
+  | Click(int)
   | CheckInput
   | Reset
   | SetStrictness
@@ -161,7 +161,8 @@ let make = _children => {
         {...state, input: [color, ...state.input]},
         self => self.send(CheckInput),
       )
-    | Click => ReasonReact.Update({...state, points: state.points + 1})
+    | Click(bonus) =>
+      ReasonReact.Update({...state, points: state.points + bonus})
     | CheckInput =>
       let {level, input, sequence, isStrict} = state;
       let currentUserColor = Belt.List.headExn(input);
@@ -237,7 +238,7 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Green, ~active)}
-          onClick={_e => self.send(Click)}
+          onClick={_e => self.send(Click(2))}
           disabled=isPlaying
         />
         <button
