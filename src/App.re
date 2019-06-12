@@ -166,16 +166,12 @@ let make = _children => {
       | (false, _, false, _) =>
         ReasonReact.UpdateWithSideEffects(
           {...state, input: []},
-          self => {
-            Sounds.error##play();
-          },
+          self => Sounds.error##play(),
         )
       | (false, _, true, _) =>
         ReasonReact.UpdateWithSideEffects(
           {...state, input: [], level: 1},
-          self => {
-            Sounds.error##play();
-          },
+          self => Sounds.error##play(),
         )
       | (true, false, _, false) =>
         ReasonReact.SideEffects(
@@ -184,9 +180,7 @@ let make = _children => {
       | (true, true, _, false) =>
         ReasonReact.UpdateWithSideEffects(
           {...state, input: [], level: state.level + 1},
-          self => {
-            self.send(PlaySound(currentUserColor));
-          },
+          self => self.send(PlaySound(currentUserColor)),
         )
       | (true, _, _, true) =>
         let list = makeSequence();
