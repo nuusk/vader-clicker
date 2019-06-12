@@ -2,17 +2,14 @@ open Webapi.Dom;
 
 type state = {
   active: option(Types.colors),
-  isPlaying: bool,
   points: int,
   income: int,
 };
 
 type action =
   | PlaySound(Types.colors)
-  | ResetColor
   | Click(int)
-  | BuyBonus(int, int)
-  | SetPlaying;
+  | BuyBonus(int, int);
 
 module Styles = {
   open Css;
@@ -78,7 +75,7 @@ let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  initialState: () => {active: None, isPlaying: false, points: 0, income: 1},
+  initialState: () => {active: None, points: 0, income: 1},
   reducer: (action, state) =>
     switch (action) {
     | PlaySound(color) =>
@@ -89,11 +86,9 @@ let make = _children => {
             Belt.List.getAssoc(Sounds.map, color, (==))
             ->Belt.Option.getWithDefault(Sounds.green);
           sound##play();
-          let _id = Js.Global.setTimeout(() => self.send(ResetColor), 300);
           ();
         },
       )
-    | ResetColor => ReasonReact.Update({...state, active: None})
     | Click(bonus) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, points: state.points + bonus},
@@ -125,14 +120,9 @@ let make = _children => {
           | _ => (_ => Sounds.badfeeling##play())
           },
         );
-    | SetPlaying =>
-      ReasonReact.Update({...state, isPlaying: !state.isPlaying})
     },
-  didMount: self => {
-    ();
-  },
   render: self => {
-    let {active, isPlaying, points, income} = self.state;
+    let {active, points, income} = self.state;
     <div className=Styles.container>
       <h1> "ciacho judasza"->ReasonReact.string </h1>
       <h2> {ReasonReact.string(string_of_int(points))} </h2>
@@ -141,25 +131,21 @@ let make = _children => {
           type_="button"
           className={Styles.box(~bgColor=Green, ~active)}
           onClick={_e => self.send(Click(income))}
-          disabled=isPlaying
         />
         <button
           type_="button"
           className={Styles.box(~bgColor=Red, ~active)}
           onClick={_e => self.send(BuyBonus(1, 10))}
-          disabled=isPlaying
         />
         <button
           type_="button"
           className={Styles.box(~bgColor=Blue, ~active)}
           //onClick={_e => self.send(Input(Blue))}
-          disabled=isPlaying
         />
         <button
           type_="button"
           className={Styles.box(~bgColor=Yellow, ~active)}
           //onClick={_e => self.send(Input(Yellow))}
-          disabled=isPlaying
         />
       </div>
     </div>;
