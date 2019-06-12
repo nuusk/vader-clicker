@@ -1,26 +1,17 @@
 open Webapi.Dom;
 
-type sequence = list(Types.colors);
-
 type state = {
-  sequence,
-  level: int,
   active: option(Types.colors),
-  input: list(Types.colors),
-  isStrict: bool,
   isPlaying: bool,
   points: int,
   income: int,
 };
 
 type action =
-  | SetSequence(sequence)
   | PlaySound(Types.colors)
   | ResetColor
-  | Input(Types.colors)
   | Click(int)
-  | BuyBonus(int)
-  | CheckInput
+  | BuyBonus(int, int)
   | SetPlaying;
 
 module Styles = {
@@ -83,39 +74,13 @@ module Styles = {
   let buttons = style([marginTop(`px(10))]);
 };
 
-let makeSequence = (~len=5, ()) =>
-  Belt.List.makeBy(
-    len,
-    _i => {
-      open Types;
-      let num = Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0);
-      switch (num) {
-      | 1 => Green
-      | 2 => Red
-      | 3 => Blue
-      | 4 => Yellow
-      | _ => Green
-      };
-    },
-  );
-
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  initialState: () => {
-    sequence: [],
-    level: 1,
-    active: None,
-    input: [],
-    isStrict: false,
-    isPlaying: false,
-    points: 0,
-    income: 1,
-  },
+  initialState: () => {active: None, isPlaying: false, points: 0, income: 1},
   reducer: (action, state) =>
     switch (action) {
-    | SetSequence(list) => ReasonReact.Update({...state, sequence: list})
     | PlaySound(color) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, active: Some(color)},
@@ -129,83 +94,45 @@ let make = _children => {
         },
       )
     | ResetColor => ReasonReact.Update({...state, active: None})
-    | Input(color) =>
-      ReasonReact.UpdateWithSideEffects(
-        {...state, input: [color, ...state.input]},
-        self => self.send(CheckInput),
-      )
     | Click(bonus) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, points: state.points + bonus},
         self => Sounds.error##play(),
       )
-    | BuyBonus(bonus) =>
-      ReasonReact.UpdateWithSideEffects(
-        {...state, income: state.income + bonus},
-        switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-        | 1 => (_ => Sounds.force##play())
-        | 2 => (_ => Sounds.luck##play())
-        | 3 => (_ => Sounds.notout##play())
-        | 4 => (_ => Sounds.strong##play())
-        | _ => (_ => Sounds.badfeeling##play())
-        },
-      )
-    | CheckInput =>
-      let {level, input, sequence, isStrict} = state;
-      let currentUserColor = Belt.List.headExn(input);
-      let inputLength = Belt.List.length(input);
-      let currentSequenceColor = Belt.List.getExn(sequence, inputLength - 1);
-      let isEnd = inputLength === Belt.List.length(sequence);
-      switch (
-        currentUserColor === currentSequenceColor,
-        inputLength === level,
-        isStrict,
-        isEnd,
-      ) {
-      | (false, _, false, _) =>
+    | BuyBonus(bonus, cost) =>
+      let {points} = state;
+      cost <= points ?
         ReasonReact.UpdateWithSideEffects(
-          {...state, input: []},
-          self => Sounds.error##play(),
-        )
-      | (false, _, true, _) =>
-        ReasonReact.UpdateWithSideEffects(
-          {...state, input: [], level: 1},
-          self => Sounds.error##play(),
-        )
-      | (true, false, _, false) =>
+          {
+            ...state,
+            income: state.income + bonus,
+            points: state.points - cost,
+          },
+          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          | 1 => (_ => Sounds.force##play())
+          | 2 => (_ => Sounds.luck##play())
+          | 3 => (_ => Sounds.notout##play())
+          | 4 => (_ => Sounds.strong##play())
+          | _ => (_ => Sounds.badfeeling##play())
+          },
+        ) :
         ReasonReact.SideEffects(
-          self => self.send(PlaySound(currentUserColor)),
-        )
-      | (true, true, _, false) =>
-        ReasonReact.UpdateWithSideEffects(
-          {...state, input: [], level: state.level + 1},
-          self => self.send(PlaySound(currentUserColor)),
-        )
-      | (true, _, _, true) =>
-        let list = makeSequence();
-        ReasonReact.UpdateWithSideEffects(
-          {...state, input: [], level: 1, sequence: list},
-          self => {
-            self.send(PlaySound(currentUserColor));
-            let _id =
-              Js.Global.setTimeout(
-                () => Window.alert("You won!", window),
-                400,
-              );
-            ();
+          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          | 1 => (_ => Sounds.error##play())
+          | 2 => (_ => Sounds.error##play())
+          | 3 => (_ => Sounds.error##play())
+          | 4 => (_ => Sounds.error##play())
+          | _ => (_ => Sounds.badfeeling##play())
           },
         );
-      };
     | SetPlaying =>
       ReasonReact.Update({...state, isPlaying: !state.isPlaying})
     },
   didMount: self => {
-    let list = makeSequence();
-    self.send(SetSequence(list));
     ();
   },
   render: self => {
-    let {level, active, isStrict, isPlaying, points, income} = self.state;
+    let {active, isPlaying, points, income} = self.state;
     <div className=Styles.container>
       <h1> "ciacho judasza"->ReasonReact.string </h1>
       <h2> {ReasonReact.string(string_of_int(points))} </h2>
@@ -219,19 +146,19 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Red, ~active)}
-          onClick={_e => self.send(BuyBonus(1))}
+          onClick={_e => self.send(BuyBonus(1, 10))}
           disabled=isPlaying
         />
         <button
           type_="button"
           className={Styles.box(~bgColor=Blue, ~active)}
-          onClick={_e => self.send(Input(Blue))}
+          //onClick={_e => self.send(Input(Blue))}
           disabled=isPlaying
         />
         <button
           type_="button"
           className={Styles.box(~bgColor=Yellow, ~active)}
-          onClick={_e => self.send(Input(Yellow))}
+          //onClick={_e => self.send(Input(Yellow))}
           disabled=isPlaying
         />
       </div>
