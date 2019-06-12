@@ -23,7 +23,7 @@ type action =
 
 let component = ReasonReact.reducerComponent("App");
 
-let make = _children => {
+let make = _ => {
   ...component,
   initialState: () => {
     points: 0,
