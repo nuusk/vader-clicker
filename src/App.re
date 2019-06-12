@@ -17,15 +17,6 @@ type action =
 module Styles = {
   open Css;
 
-  global(
-    "body",
-    [
-      fontFamily(
-        "-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell,\"Helvetica Neue\",sans-serif",
-      ),
-    ],
-  );
-
   let container =
     style([
       display(`flex),
@@ -162,7 +153,7 @@ let make = _children => {
         <span> {ReasonReact.string(string_of_int(revenue))} </span>
       </h1>
       <h1> "ciacho judasza"->ReasonReact.string </h1>
-      <h2> {ReasonReact.string(string_of_int(points))} </h2>
+      <strong> {ReasonReact.string(string_of_int(points))} </strong>
       <div className=Styles.boxes>
         <button
           type_="button"
