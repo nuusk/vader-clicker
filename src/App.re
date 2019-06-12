@@ -40,7 +40,21 @@ let make = _children => {
     switch (action) {
     | Click(bonus) =>
       ReasonReact.Update({...state, points: state.points + bonus})
-    | Reset => ReasonReact.Update({...state, points: 0})
+    | Reset => ReasonReact.UpdateWithSideEffects({ 
+          points: 0, 
+          income: 1,
+          revenue: 0,
+          incomeBonus: 1,
+          revenueBonus: 1,
+          incomeBonusCost: 10,
+          revenueBonusCost: 20,
+          incomeMultiplierCost: 100,
+          revenueMultiplierCost: 200,
+    },
+      self => {
+        Sounds.trap##play()
+      }
+    )
     | Payment =>
       ReasonReact.Update({...state, points: state.points + state.revenue})
     | IncreaseRevenue(bonus, cost) =>
