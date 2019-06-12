@@ -15,15 +15,12 @@ type state = {
 
 type action =
   | SetSequence(sequence)
-  | PlaySequence
   | PlaySound(Types.colors)
   | ResetColor
   | Input(Types.colors)
   | Click(int)
   | BuyBonus(int)
   | CheckInput
-  | Reset
-  | SetStrictness
   | SetPlaying;
 
 module Styles = {
@@ -119,33 +116,6 @@ let make = _children => {
   reducer: (action, state) =>
     switch (action) {
     | SetSequence(list) => ReasonReact.Update({...state, sequence: list})
-    | PlaySequence =>
-      let l =
-        Belt.List.take(state.sequence, state.level)
-        ->Belt.Option.getWithDefault([]);
-      ReasonReact.UpdateWithSideEffects(
-        {...state, isPlaying: true},
-        self => {
-          Belt.List.forEachWithIndex(
-            l,
-            (index, color) => {
-              let _id =
-                Js.Global.setTimeout(
-                  () => self.send(PlaySound(color)),
-                  (index + 1) * 1000,
-                );
-              ();
-            },
-          );
-
-          let _id =
-            Js.Global.setTimeout(
-              () => self.send(SetPlaying),
-              state.level * 1000 + 300,
-            );
-          ();
-        },
-      );
     | PlaySound(color) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, active: Some(color)},
@@ -185,7 +155,6 @@ let make = _children => {
           {...state, input: []},
           self => {
             Sounds.error##play();
-            self.send(PlaySequence);
           },
         )
       | (false, _, true, _) =>
@@ -193,7 +162,6 @@ let make = _children => {
           {...state, input: [], level: 1},
           self => {
             Sounds.error##play();
-            self.send(PlaySequence);
           },
         )
       | (true, false, _, false) =>
@@ -205,7 +173,6 @@ let make = _children => {
           {...state, input: [], level: state.level + 1},
           self => {
             self.send(PlaySound(currentUserColor));
-            self.send(PlaySequence);
           },
         )
       | (true, _, _, true) =>
@@ -223,9 +190,6 @@ let make = _children => {
           },
         );
       };
-    | Reset => ReasonReact.Update({...state, input: [], level: 1})
-    | SetStrictness =>
-      ReasonReact.Update({...state, isStrict: !state.isStrict})
     | SetPlaying =>
       ReasonReact.Update({...state, isPlaying: !state.isPlaying})
     },
@@ -264,25 +228,6 @@ let make = _children => {
           onClick={_e => self.send(Input(Yellow))}
           disabled=isPlaying
         />
-      </div>
-      <div className=Styles.controls>
-        <div>
-          <span> "Strict"->ReasonReact.string </span>
-          <input
-            type_="checkbox"
-            checked=isStrict
-            onChange={_e => self.send(SetStrictness)}
-          />
-        </div>
-        <div> {{j|Level: $level|j} |> ReasonReact.string} </div>
-        <div className=Styles.buttons>
-          <button onClick={_e => self.send(PlaySequence)} disabled=isPlaying>
-            {"Start" |> ReasonReact.string}
-          </button>
-          <button onClick={_e => self.send(Reset)} disabled=isPlaying>
-            "Reset"->ReasonReact.string
-          </button>
-        </div>
       </div>
     </div>;
   },
