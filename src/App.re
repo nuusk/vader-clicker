@@ -40,8 +40,10 @@ let make = _children => {
     switch (action) {
     | Click(bonus) =>
       ReasonReact.Update({...state, points: state.points + bonus})
-    | Reset => ReasonReact.UpdateWithSideEffects({ 
-          points: 0, 
+    | Reset =>
+      ReasonReact.UpdateWithSideEffects(
+        {
+          points: 0,
           income: 1,
           revenue: 0,
           incomeBonus: 1,
@@ -50,11 +52,9 @@ let make = _children => {
           revenueBonusCost: 20,
           incomeMultiplierCost: 100,
           revenueMultiplierCost: 200,
-    },
-      self => {
-        Sounds.trap##play()
-      }
-    )
+        },
+        self => Sounds.trap##play(),
+      )
     | Payment =>
       ReasonReact.Update({...state, points: state.points + state.revenue})
     | IncreaseRevenue(bonus, cost) =>
@@ -187,12 +187,14 @@ let make = _children => {
         <div
           className="game__button game__button--income"
           onClick={_e => self.send(BuyBonus(incomeBonus, incomeBonusCost))}>
+          <span> "+inc"->ReasonReact.string </span>
           <span> "cost"->ReasonReact.string </span>
           <span> {ReasonReact.string(string_of_int(incomeBonusCost))} </span>
         </div>
         <div
           className="game__button game__button--income"
           onClick={_e => self.send(MultiplyIncome(2, incomeMultiplierCost))}>
+          <span> "x2inc"->ReasonReact.string </span>
           <span> "cost"->ReasonReact.string </span>
           <span>
             {ReasonReact.string(string_of_int(incomeMultiplierCost))}
@@ -203,6 +205,7 @@ let make = _children => {
           onClick={_e =>
             self.send(IncreaseRevenue(revenueBonus, revenueBonusCost))
           }>
+          <span> "+rev"->ReasonReact.string </span>
           <span> "cost"->ReasonReact.string </span>
           <span>
             {ReasonReact.string(string_of_int(revenueBonusCost))}
@@ -213,6 +216,7 @@ let make = _children => {
           onClick={_e =>
             self.send(MultiplyRevenue(2, revenueMultiplierCost))
           }>
+          <span> "x2rev"->ReasonReact.string </span>
           <span> "cost"->ReasonReact.string </span>
           <span>
             {ReasonReact.string(string_of_int(revenueMultiplierCost))}
