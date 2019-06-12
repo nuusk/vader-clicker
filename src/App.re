@@ -4,11 +4,14 @@ type state = {
   active: option(Types.colors),
   points: int,
   income: int,
+  revenue: int,
 };
 
 type action =
   | PlaySound(Types.colors)
   | Click(int)
+  | IncreaseRevenue(int, int)
+  | Payment
   | BuyBonus(int, int);
 
 module Styles = {
@@ -75,7 +78,7 @@ let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  initialState: () => {active: None, points: 0, income: 1},
+  initialState: () => {active: None, points: 0, income: 1, revenue: 0},
   reducer: (action, state) =>
     switch (action) {
     | PlaySound(color) =>
@@ -90,10 +93,35 @@ let make = _children => {
         },
       )
     | Click(bonus) =>
-      ReasonReact.UpdateWithSideEffects(
-        {...state, points: state.points + bonus},
-        self => Sounds.error##play(),
-      )
+      ReasonReact.Update({...state, points: state.points + bonus})
+    | Payment =>
+      ReasonReact.Update({...state, points: state.points + state.revenue})
+    | IncreaseRevenue(bonus, cost) =>
+      let {points} = state;
+      cost <= points ?
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            revenue: state.revenue + bonus,
+            points: state.points - cost,
+          },
+          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          | 1 => (_ => Sounds.force##play())
+          | 2 => (_ => Sounds.luck##play())
+          | 3 => (_ => Sounds.notout##play())
+          | 4 => (_ => Sounds.strong##play())
+          | _ => (_ => Sounds.badfeeling##play())
+          },
+        ) :
+        ReasonReact.SideEffects(
+          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          | 1 => (_ => Sounds.error##play())
+          | 2 => (_ => Sounds.error##play())
+          | 3 => (_ => Sounds.error##play())
+          | 4 => (_ => Sounds.error##play())
+          | _ => (_ => Sounds.badfeeling##play())
+          },
+        );
     | BuyBonus(bonus, cost) =>
       let {points} = state;
       cost <= points ?
@@ -121,9 +149,18 @@ let make = _children => {
           },
         );
     },
+  didMount: self => {
+    let intervalId = Js.Global.setInterval(() => self.send(Payment), 1000);
+    self.onUnmount(() => Js.Global.clearInterval(intervalId));
+    ();
+  },
   render: self => {
-    let {active, points, income} = self.state;
+    let {active, points, income, revenue} = self.state;
     <div className=Styles.container>
+      <h1>
+        <span> "revenue: "->ReasonReact.string </span>
+        <span> {ReasonReact.string(string_of_int(revenue))} </span>
+      </h1>
       <h1> "ciacho judasza"->ReasonReact.string </h1>
       <h2> {ReasonReact.string(string_of_int(points))} </h2>
       <div className=Styles.boxes>
@@ -140,7 +177,7 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Blue, ~active)}
-          //onClick={_e => self.send(Input(Blue))}
+          onClick={_e => self.send(IncreaseRevenue(2, 6))}
         />
         <button
           type_="button"
