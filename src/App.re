@@ -110,9 +110,6 @@ let make = _children => {
         )
       }
     },
-  didMount: self => {
-    ();
-  },
   render: self => {
     let {active, points, income} = self.state;
     <div className=Styles.container>
