@@ -1,5 +1,3 @@
-open Types;
-
 let error =
   Audio.createAudio(
     "https://s3.amazonaws.com/adam-recvlohe-sounds/error.wav",
@@ -23,3 +21,4 @@ let learn = Audio.createAudio("/public/quotes/learn.mp3");
 let scruvvy = Audio.createAudio("/public/quotes/scruffy.mp3");
 let sfoils = Audio.createAudio("/public/quotes/s-foils.mp3");
 let trap = Audio.createAudio("/public/quotes/trap.mp3");
+let munch = Audio.createAudio("/public/quotes/munch.mp3");
