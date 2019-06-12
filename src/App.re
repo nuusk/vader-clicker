@@ -75,11 +75,7 @@ let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  initialState: () => {
-    active: None,
-    points: 0,
-    income: 1,
-  },
+  initialState: () => {active: None, points: 0, income: 1},
   reducer: (action, state) =>
     switch (action) {
     | PlaySound(color) =>
@@ -94,21 +90,36 @@ let make = _children => {
         },
       )
     | Click(bonus) =>
-      ReasonReact.Update({...state, points: state.points + bonus})
+      ReasonReact.UpdateWithSideEffects(
+        {...state, points: state.points + bonus},
+        self => Sounds.error##play(),
+      )
     | BuyBonus(bonus, cost) =>
       let {points} = state;
-      switch (
-        cost <= points
-      ) {
-        | (true) =>
-          ReasonReact.Update({...state, income: state.income + bonus, points: state.points - cost})
-        | (false) =>
-          ReasonReact.SideEffects(
-          (self) => {
-            Sounds.error##play();
+      cost <= points ?
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            income: state.income + bonus,
+            points: state.points - cost,
           },
-        )
-      }
+          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          | 1 => (_ => Sounds.force##play())
+          | 2 => (_ => Sounds.luck##play())
+          | 3 => (_ => Sounds.notout##play())
+          | 4 => (_ => Sounds.strong##play())
+          | _ => (_ => Sounds.badfeeling##play())
+          },
+        ) :
+        ReasonReact.SideEffects(
+          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          | 1 => (_ => Sounds.error##play())
+          | 2 => (_ => Sounds.error##play())
+          | 3 => (_ => Sounds.error##play())
+          | 4 => (_ => Sounds.error##play())
+          | _ => (_ => Sounds.badfeeling##play())
+          },
+        );
     },
   render: self => {
     let {active, points, income} = self.state;
@@ -124,7 +135,7 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Red, ~active)}
-          onClick={_e => self.send(BuyBonus(1,10))}
+          onClick={_e => self.send(BuyBonus(1, 10))}
         />
         <button
           type_="button"
