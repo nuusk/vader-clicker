@@ -139,7 +139,6 @@ let make = _children => {
         {...state, points: state.points + bonus},
         self => {
           Sounds.error##play();
-          self.send(PlaySequence);
         },
       )
     | BuyBonus(bonus) =>
