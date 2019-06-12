@@ -19,7 +19,7 @@ type action =
   | ResetColor
   | Input(Types.colors)
   | Click(int)
-  | BuyBonus(int)
+  | BuyBonus(int, int)
   | CheckInput
   | SetPlaying;
 
@@ -136,8 +136,21 @@ let make = _children => {
       )
     | Click(bonus) =>
       ReasonReact.Update({...state, points: state.points + bonus})
-    | BuyBonus(bonus) =>
-      ReasonReact.Update({...state, income: state.income + bonus})
+    | BuyBonus(bonus, cost) =>
+      let {points} = state;
+      switch (
+        cost <= points
+      ) {
+        | (true) =>
+          ReasonReact.Update({...state, income: state.income + bonus, points: state.points - cost})
+        | (false) =>
+          ReasonReact.UpdateWithSideEffects(
+          {...state, input: []},
+          self => {
+            Sounds.error##play();
+          },
+        )
+      }
     | CheckInput =>
       let {level, input, sequence, isStrict} = state;
       let currentUserColor = Belt.List.headExn(input);
@@ -213,7 +226,7 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Red, ~active)}
-          onClick={_e => self.send(BuyBonus(1))}
+          onClick={_e => self.send(BuyBonus(1,10))}
           disabled=isPlaying
         />
         <button
