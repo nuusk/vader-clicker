@@ -1,4 +1,6 @@
 # Vader Clicker
 
-`npm install`
-`npm start`
+![](vader.gif)
+
+$ npm install
+$ npm start
