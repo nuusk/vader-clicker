@@ -1,5 +1,3 @@
-open Webapi.Dom;
-
 type state = {
   points: int,
   income: int,
@@ -18,7 +16,9 @@ type action =
   | Payment
   | BuyBonus(int, int)
   | MultiplyRevenue(int, int)
-  | MultiplyIncome(int, int);
+  | MultiplyIncome(int, int)
+  | PlaySuccessSound
+  | PlayErrorSound;
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -52,23 +52,14 @@ let make = _children => {
             revenueBonusCost:
               Js.Math.ceil(float_of_int(state.revenueBonusCost) *. 1.1),
           },
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-          | 1 => (_ => Sounds.force##play())
-          | 2 => (_ => Sounds.luck##play())
-          | 3 => (_ => Sounds.notout##play())
-          | 4 => (_ => Sounds.strong##play())
-          | _ => (_ => Sounds.badfeeling##play())
+          self => {
+            self.send(PlaySuccessSound);
           },
         ) :
         ReasonReact.SideEffects(
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-          | 1 => (_ => Sounds.error##play())
-          | 2 => (_ => Sounds.error##play())
-          | 3 => (_ => Sounds.error##play())
-          | 4 => (_ => Sounds.error##play())
-          | _ => (_ => Sounds.badfeeling##play())
-          },
-        );
+        self => {
+          self.send(PlayErrorSound);
+        });
     | BuyBonus(bonus, cost) =>
       let {points} = state;
       cost <= points ?
@@ -80,23 +71,14 @@ let make = _children => {
             incomeBonusCost:
               Js.Math.ceil(float_of_int(state.incomeBonusCost) *. 1.1),
           },
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-          | 1 => (_ => Sounds.force##play())
-          | 2 => (_ => Sounds.luck##play())
-          | 3 => (_ => Sounds.notout##play())
-          | 4 => (_ => Sounds.strong##play())
-          | _ => (_ => Sounds.badfeeling##play())
+          self => {
+            self.send(PlaySuccessSound);
           },
         ) :
         ReasonReact.SideEffects(
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-          | 1 => (_ => Sounds.error##play())
-          | 2 => (_ => Sounds.error##play())
-          | 3 => (_ => Sounds.error##play())
-          | 4 => (_ => Sounds.error##play())
-          | _ => (_ => Sounds.badfeeling##play())
-          },
-        );
+        self => {
+          self.send(PlayErrorSound);
+        });
     | MultiplyIncome(multiplier, cost) =>
       let {points} = state;
       cost <= points ?
@@ -108,23 +90,14 @@ let make = _children => {
             incomeMultiplierCost: state.incomeMultiplierCost * 10,
             incomeBonus: state.incomeBonus * multiplier,
           },
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-          | 1 => (_ => Sounds.force##play())
-          | 2 => (_ => Sounds.luck##play())
-          | 3 => (_ => Sounds.notout##play())
-          | 4 => (_ => Sounds.strong##play())
-          | _ => (_ => Sounds.badfeeling##play())
+          self => {
+            self.send(PlaySuccessSound);
           },
         ) :
         ReasonReact.SideEffects(
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
-          | 1 => (_ => Sounds.error##play())
-          | 2 => (_ => Sounds.error##play())
-          | 3 => (_ => Sounds.error##play())
-          | 4 => (_ => Sounds.error##play())
-          | _ => (_ => Sounds.badfeeling##play())
-          },
-        );
+        self => {
+          self.send(PlayErrorSound);
+        });
       | MultiplyRevenue(multiplier, cost) =>
       let {points} = state;
       cost <= points ?
@@ -136,14 +109,38 @@ let make = _children => {
             revenueMultiplierCost: state.revenueMultiplierCost * 10,
             revenueBonus: state.revenueBonus * multiplier,
           },
+          self => {
+            self.send(PlaySuccessSound);
+          },
+        ) :
+        ReasonReact.SideEffects(
+        self => {
+          self.send(PlayErrorSound);
+        });
+      | PlaySuccessSound => 
+        ReasonReact.SideEffects(
           switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
           | 1 => (_ => Sounds.force##play())
           | 2 => (_ => Sounds.luck##play())
           | 3 => (_ => Sounds.notout##play())
           | 4 => (_ => Sounds.strong##play())
+          | 5 => (_ => Sounds.destiny##play())
+          | 6 => (_ => Sounds.evasion##play())
+          | 7 => (_ => Sounds.failed##play())
+          | 8 => (_ => Sounds.force2##play())
+          | 9 => (_ => Sounds.goodshoot##play())
+          | 10 => (_ => Sounds.great##play())
+          | 11 => (_ => Sounds.intesify##play())
+          | 12 => (_ => Sounds.jedi##play())
+          | 13 => (_ => Sounds.learn##play())
+          | 14 => (_ => Sounds.scruvvy##play())
+          | 15 => (_ => Sounds.sfoils##play())
+          | 16 => (_ => Sounds.trap##play())
+          | 17 => (_ => Sounds.darkside##play())
           | _ => (_ => Sounds.badfeeling##play())
-          },
-        ) :
+          }
+      );
+      | PlayErrorSound => 
         ReasonReact.SideEffects(
           switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
           | 1 => (_ => Sounds.error##play())
