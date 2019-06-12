@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  font-family: 'Press Start 2P';
+  color: white;
+  background-color: black; }
+
+strong {
+  font-size: 80px;
+  margin: 20px 0; }
+
+.background-gif {
+  position: fixed;
+  object-fit: cover;
+  z-index: -1;
+  min-width: 100vw;
+  min-height: 100vh; }

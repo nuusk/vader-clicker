@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "concurrently \"npm run js-watch\" \"npm run bs-watch\" \"node-sass -w src/main.scss -o src/main.css\"",
+    "start": "concurrently \"npm run js-watch\" \"npm run bs-watch\" \"node-sass -w src/main.scss -o build\"",
     "js-watch": "webpack-dev-server --hot --inline",
     "bs-watch": "bsb -make-world -w"
   },

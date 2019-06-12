@@ -19,15 +19,6 @@ type action =
 module Styles = {
   open Css;
 
-  global(
-    "body",
-    [
-      fontFamily(
-        "-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell,\"Helvetica Neue\",sans-serif",
-      ),
-    ],
-  );
-
   let container =
     style([
       display(`flex),
@@ -161,10 +152,10 @@ let make = _children => {
   render: self => {
     let {active, points, income, revenue, incomeBonusCost, revenueBonusCost} = self.state;
     <div className=Styles.container>
-      <h1> 
+      <strong> 
         <span> "Points: "->ReasonReact.string </span>
         <span> {ReasonReact.string(string_of_int(points))} </span>
-      </h1>
+      </strong>
       <h1>
         <span> "revenue: "->ReasonReact.string </span>
         <span> {ReasonReact.string(string_of_int(revenue))} </span>
