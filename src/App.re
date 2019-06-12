@@ -41,7 +41,7 @@ let make = _children => {
     | Click(bonus) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, points: state.points + bonus},
-        self => Sounds.munch##play(),
+        self => Sounds.blaster##play(),
       )
     | Reset =>
       ReasonReact.UpdateWithSideEffects(

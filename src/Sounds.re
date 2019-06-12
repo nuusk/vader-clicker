@@ -22,3 +22,4 @@ let scruvvy = Audio.createAudio("/public/quotes/scruffy.mp3");
 let sfoils = Audio.createAudio("/public/quotes/s-foils.mp3");
 let trap = Audio.createAudio("/public/quotes/trap.mp3");
 let munch = Audio.createAudio("/public/quotes/munch.mp3");
+let blaster = Audio.createAudio("/public/quotes/blaster.mp3");
