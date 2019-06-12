@@ -137,12 +137,19 @@ let make = _children => {
     | Click(bonus) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, points: state.points + bonus},
-        self => {
-          Sounds.error##play();
-        },
+        self => Sounds.error##play(),
       )
     | BuyBonus(bonus) =>
-      ReasonReact.Update({...state, income: state.income + bonus})
+      ReasonReact.UpdateWithSideEffects(
+        {...state, income: state.income + bonus},
+        switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+        | 1 => (_ => Sounds.force##play())
+        | 2 => (_ => Sounds.luck##play())
+        | 3 => (_ => Sounds.notout##play())
+        | 4 => (_ => Sounds.strong##play())
+        | _ => (_ => Sounds.badfeeling##play())
+        },
+      )
     | CheckInput =>
       let {level, input, sequence, isStrict} = state;
       let currentUserColor = Belt.List.headExn(input);
