@@ -153,7 +153,6 @@ let make = _children => {
     let {active, points, income, revenue, incomeBonusCost, revenueBonusCost} = self.state;
     <div className=Styles.container>
       <strong> 
-        <span> "Points: "->ReasonReact.string </span>
         <span> {ReasonReact.string(string_of_int(points))} </span>
       </strong>
       <h1>
