@@ -1,7 +1,6 @@
 open Webapi.Dom;
 
 type state = {
-  active: option(Types.colors),
   points: int,
   income: int,
   revenue: int,
@@ -10,7 +9,6 @@ type state = {
 };
 
 type action =
-  | PlaySound(Types.colors)
   | Click(int)
   | IncreaseRevenue(int, int)
   | Payment
@@ -21,7 +19,6 @@ let component = ReasonReact.reducerComponent("App");
 let make = _children => {
   ...component,
   initialState: () => {
-    active: None,
     points: 0,
     income: 1,
     revenue: 0,
@@ -30,17 +27,6 @@ let make = _children => {
   },
   reducer: (action, state) =>
     switch (action) {
-    | PlaySound(color) =>
-      ReasonReact.UpdateWithSideEffects(
-        {...state, active: Some(color)},
-        self => {
-          let sound =
-            Belt.List.getAssoc(Sounds.map, color, (==))
-            ->Belt.Option.getWithDefault(Sounds.green);
-          sound##play();
-          ();
-        },
-      )
     | Click(bonus) =>
       ReasonReact.Update({...state, points: state.points + bonus})
     | Payment =>
@@ -108,7 +94,7 @@ let make = _children => {
     ();
   },
   render: self => {
-    let {active, points, income, revenue, incomeBonusCost, revenueBonusCost} =
+    let {points, income, revenue, incomeBonusCost, revenueBonusCost} =
       self.state;
     <div className="game">
       <div className="game__header">
