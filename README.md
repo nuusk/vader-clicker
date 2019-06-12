@@ -1,6 +1,12 @@
 # Vader Clicker
 
-![](vader.gif)
+<p align="center">
+  <img src="vader.gif">
+</p>
 
-$ npm install
-$ npm start
+```
+npm install
+```
+```
+npm start
+```
