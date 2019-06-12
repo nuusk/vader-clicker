@@ -165,7 +165,13 @@ let make = _children => {
         self => self.send(CheckInput),
       )
     | Click(bonus) =>
-      ReasonReact.Update({...state, points: state.points + bonus})
+      ReasonReact.UpdateWithSideEffects(
+        {...state, points: state.points + bonus},
+        self => {
+          Sounds.error##play();
+          self.send(PlaySequence);
+        },
+      )
     | BuyBonus(bonus) =>
       ReasonReact.Update({...state, income: state.income + bonus})
     | CheckInput =>
@@ -237,54 +243,56 @@ let make = _children => {
   render: self => {
     let {level, active, isStrict, isPlaying, points, income} = self.state;
     <div className=Styles.container>
-      <h1> "ciacho judasza"->ReasonReact.string </h1>
-      <h2> {ReasonReact.string(string_of_int(points))} </h2>
-      <div className=Styles.boxes>
-        <button
-          type_="button"
-          className={Styles.box(~bgColor=Green, ~active)}
-          onClick={_e => self.send(Click(income))}
-          disabled=isPlaying
-        />
-        <button
-          type_="button"
-          className={Styles.box(~bgColor=Red, ~active)}
-          onClick={_e => self.send(BuyBonus(1))}
-          disabled=isPlaying
-        />
-        <button
-          type_="button"
-          className={Styles.box(~bgColor=Blue, ~active)}
-          onClick={_e => self.send(Input(Blue))}
-          disabled=isPlaying
-        />
-        <button
-          type_="button"
-          className={Styles.box(~bgColor=Yellow, ~active)}
-          onClick={_e => self.send(Input(Yellow))}
-          disabled=isPlaying
-        />
-      </div>
-      <div className=Styles.controls>
-        <div>
-          <span> "Strict"->ReasonReact.string </span>
-          <input
-            type_="checkbox"
-            checked=isStrict
-            onChange={_e => self.send(SetStrictness)}
+      // <h1> "ciacho judasza"->ReasonReact.string </h1>
+
+        <h2> {ReasonReact.string(string_of_int(points))} </h2>
+        <div className=Styles.boxes>
+          <button
+            type_="button"
+            className={Styles.box(~bgColor=Green, ~active)}
+            onClick={_e => self.send(Click(income))}
+            disabled=isPlaying
+          />
+          <button
+            type_="button"
+            className={Styles.box(~bgColor=Red, ~active)}
+            onClick={_e => self.send(BuyBonus(1))}
+            disabled=isPlaying
+          />
+          <button
+            type_="button"
+            className={Styles.box(~bgColor=Blue, ~active)}
+            onClick={_e => self.send(Input(Blue))}
+            disabled=isPlaying
+          />
+          <button
+            type_="button"
+            className={Styles.box(~bgColor=Yellow, ~active)}
+            onClick={_e => self.send(Input(Yellow))}
+            disabled=isPlaying
           />
         </div>
-        <div> {{j|Level: $level|j} |> ReasonReact.string} </div>
-        <div className=Styles.buttons>
-          <button onClick={_e => self.send(PlaySequence)} disabled=isPlaying>
-            {"Start" |> ReasonReact.string}
-          </button>
-          <button onClick={_e => self.send(Reset)} disabled=isPlaying>
-            "Reset"->ReasonReact.string
-          </button>
+        <div className=Styles.controls>
+          <div>
+            <span> "Strict"->ReasonReact.string </span>
+            <input
+              type_="checkbox"
+              checked=isStrict
+              onChange={_e => self.send(SetStrictness)}
+            />
+          </div>
+          <div> {{j|Level: $level|j} |> ReasonReact.string} </div>
+          <div className=Styles.buttons>
+            <button
+              onClick={_e => self.send(PlaySequence)} disabled=isPlaying>
+              {"Start" |> ReasonReact.string}
+            </button>
+            <button onClick={_e => self.send(Reset)} disabled=isPlaying>
+              "Reset"->ReasonReact.string
+            </button>
+          </div>
         </div>
-      </div>
-    </div>;
+      </div>;
   },
 };
 
