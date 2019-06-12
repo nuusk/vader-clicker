@@ -209,6 +209,14 @@ let make = _children => {
         </div>
         <div
           className="game__button game__button--income"
+          onClick={_e => self.send(IncreaseRevenue(revenueBonus, revenueBonusCost))}>
+          <span> "cost"->ReasonReact.string </span>
+          <span>
+            {ReasonReact.string(string_of_int(revenueBonusCost))}
+          </span>
+        </div>
+        <div
+          className="game__button game__button--income"
           onClick={_e =>
             self.send(MultiplyRevenue(2, revenueMultiplierCost))
           }>
