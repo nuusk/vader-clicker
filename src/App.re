@@ -5,6 +5,8 @@ type state = {
   points: int,
   income: int,
   revenue: int,
+  incomeBonusCost: int,
+  revenueBonusCost: int,
 };
 
 type action =
@@ -78,7 +80,7 @@ let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  initialState: () => {active: None, points: 0, income: 1, revenue: 0},
+  initialState: () => {active: None, points: 0, income: 1, revenue: 0, incomeBonusCost: 10, revenueBonusCost: 20},
   reducer: (action, state) =>
     switch (action) {
     | PlaySound(color) =>
@@ -104,6 +106,7 @@ let make = _children => {
             ...state,
             revenue: state.revenue + bonus,
             points: state.points - cost,
+            revenueBonusCost: Js.Math.ceil(float_of_int(state.revenueBonusCost) *. 1.1),
           },
           switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
           | 1 => (_ => Sounds.force##play())
@@ -130,6 +133,7 @@ let make = _children => {
             ...state,
             income: state.income + bonus,
             points: state.points - cost,
+            incomeBonusCost: Js.Math.ceil(float_of_int(state.incomeBonusCost) *. 1.1),
           },
           switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
           | 1 => (_ => Sounds.force##play())
@@ -155,14 +159,21 @@ let make = _children => {
     ();
   },
   render: self => {
-    let {active, points, income, revenue} = self.state;
+    let {active, points, income, revenue, incomeBonusCost, revenueBonusCost} = self.state;
     <div className=Styles.container>
+      <h1> 
+        <span> "Points: "->ReasonReact.string </span>
+        <span> {ReasonReact.string(string_of_int(points))} </span>
+      </h1>
       <h1>
         <span> "revenue: "->ReasonReact.string </span>
         <span> {ReasonReact.string(string_of_int(revenue))} </span>
       </h1>
       <h1> "ciacho judasza"->ReasonReact.string </h1>
-      <h2> {ReasonReact.string(string_of_int(points))} </h2>
+      <h2> 
+        <span> "income per click: "->ReasonReact.string </span>
+        <span> {ReasonReact.string(string_of_int(income))} </span>
+      </h2>
       <div className=Styles.boxes>
         <button
           type_="button"
@@ -172,12 +183,12 @@ let make = _children => {
         <button
           type_="button"
           className={Styles.box(~bgColor=Red, ~active)}
-          onClick={_e => self.send(BuyBonus(1, 10))}
+          onClick={_e => self.send(BuyBonus(1, incomeBonusCost))}
         />
         <button
           type_="button"
           className={Styles.box(~bgColor=Blue, ~active)}
-          onClick={_e => self.send(IncreaseRevenue(2, 6))}
+          onClick={_e => self.send(IncreaseRevenue(2, revenueBonusCost))}
         />
         <button
           type_="button"
