@@ -7,11 +7,12 @@ type state = {
   incomeBonusCost: int,
   revenueBonusCost: int,
   incomeMultiplierCost: int,
-  revenueMultiplierCost: int
+  revenueMultiplierCost: int,
 };
 
 type action =
   | Click(int)
+  | Reset
   | IncreaseRevenue(int, int)
   | Payment
   | BuyBonus(int, int)
@@ -39,6 +40,7 @@ let make = _children => {
     switch (action) {
     | Click(bonus) =>
       ReasonReact.Update({...state, points: state.points + bonus})
+    | Reset => ReasonReact.Update({...state, points: 0})
     | Payment =>
       ReasonReact.Update({...state, points: state.points + state.revenue})
     | IncreaseRevenue(bonus, cost) =>
@@ -119,7 +121,7 @@ let make = _children => {
         });
       | PlaySuccessSound => 
         ReasonReact.SideEffects(
-          switch (Js.Math.floor(Js.Math.random() *. 4.0 +. 1.0)) {
+          switch (Js.Math.floor(Js.Math.random() *. 17.0 +. 1.0)) {
           | 1 => (_ => Sounds.force##play())
           | 2 => (_ => Sounds.luck##play())
           | 3 => (_ => Sounds.notout##play())
@@ -157,7 +159,17 @@ let make = _children => {
     ();
   },
   render: self => {
-    let {points, income, revenue, incomeBonus, revenueBonus, incomeBonusCost, revenueBonusCost, incomeMultiplierCost, revenueMultiplierCost} =
+    let {
+      points,
+      income,
+      revenue,
+      incomeBonus,
+      revenueBonus,
+      incomeBonusCost,
+      revenueBonusCost,
+      incomeMultiplierCost,
+      revenueMultiplierCost,
+    } =
       self.state;
     <div className="game">
       <div className="game__header">
@@ -175,28 +187,36 @@ let make = _children => {
       </div>
       <div className="game__buttons">
         <div
-          className="game__button"
+          className="game__button game__button--click"
           onClick={_e => self.send(Click(income))}
         />
         <div
-          className="game__button"
-          onClick={_e => self.send(BuyBonus(incomeBonus, incomeBonusCost))}
-        />
+          className="game__button game__button--income"
+          onClick={_e => self.send(BuyBonus(incomeBonus, incomeBonusCost))}>
+          <span> "cost"->ReasonReact.string </span>
+          <span> {ReasonReact.string(string_of_int(incomeBonusCost))} </span>
+        </div>
         <div
-          className="game__button"
-          onClick={_e => self.send(IncreaseRevenue(revenueBonus, revenueBonusCost))}
-        />
+          className="game__button game__button--income"
+          onClick={_e => self.send(MultiplyIncome(2, incomeMultiplierCost))}>
+          <span> "cost"->ReasonReact.string </span>
+          <span>
+            {ReasonReact.string(string_of_int(incomeMultiplierCost))}
+          </span>
+        </div>
         <div
-          className="game__button"
-          onClick={_e => self.send(MultiplyIncome(2, incomeMultiplierCost))}
-        />
+          className="game__button game__button--income"
+          onClick={_e =>
+            self.send(MultiplyRevenue(2, revenueMultiplierCost))
+          }>
+          <span> "cost"->ReasonReact.string </span>
+          <span>
+            {ReasonReact.string(string_of_int(revenueMultiplierCost))}
+          </span>
+        </div>
         <div
-          className="game__button"
-          onClick={_e => self.send(MultiplyRevenue(2, revenueMultiplierCost))}
-        />        
-        <div
-          className="game__button"
-          //onClick={_e => self.send(Input(Yellow))}
+          className="game__button game__button--click"
+          onClick={_e => self.send(Reset)}
         />
       </div>
     </div>;
