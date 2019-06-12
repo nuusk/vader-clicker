@@ -39,7 +39,10 @@ let make = _children => {
   reducer: (action, state) =>
     switch (action) {
     | Click(bonus) =>
-      ReasonReact.Update({...state, points: state.points + bonus})
+      ReasonReact.UpdateWithSideEffects({...state, points: state.points + bonus},
+      self => {
+        Sounds.munch##play()
+      })
     | Reset => ReasonReact.UpdateWithSideEffects({ 
           points: 0, 
           income: 1,
